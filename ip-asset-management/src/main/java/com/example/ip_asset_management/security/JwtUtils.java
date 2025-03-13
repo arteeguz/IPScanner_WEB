@@ -10,7 +10,6 @@ import org.springframework.stereotype.Component;
 
 import java.security.Key;
 import java.util.Date;
-import javax.crypto.SecretKey;
 import java.nio.charset.StandardCharsets;
 
 @Component
@@ -26,7 +25,7 @@ public class JwtUtils {
     public String generateJwtToken(Authentication authentication) {
         UserDetailsImpl userPrincipal = (UserDetailsImpl) authentication.getPrincipal();
         
-        return Jwts.builder()
+        return io.jsonwebtoken.Jwts.builder()
                 .setSubject((userPrincipal.getUsername()))
                 .setIssuedAt(new Date())
                 .setExpiration(new Date((new Date()).getTime() + jwtExpirationMs))
@@ -39,7 +38,7 @@ public class JwtUtils {
     }
 
     public String getUserNameFromJwtToken(String token) {
-        return Jwts.parserBuilder()
+        return io.jsonwebtoken.Jwts.parserBuilder()
                 .setSigningKey(key())
                 .build()
                 .parseClaimsJws(token)
@@ -49,7 +48,7 @@ public class JwtUtils {
 
     public boolean validateJwtToken(String authToken) {
         try {
-            Jwts.parserBuilder().setSigningKey(key()).build().parseClaimsJws(authToken);
+            io.jsonwebtoken.Jwts.parserBuilder().setSigningKey(key()).build().parseClaimsJws(authToken);
             return true;
         } catch (SecurityException e) {
             logger.error("Invalid JWT signature: {}", e.getMessage());
