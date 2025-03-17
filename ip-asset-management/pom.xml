@@ -83,6 +83,20 @@
 			<artifactId>spring-security-test</artifactId>
 			<scope>test</scope>
 		</dependency>
+		
+		<!-- WMI4Java for Windows Management Instrumentation -->
+		<dependency>
+			<groupId>com.profesorfalken</groupId>
+			<artifactId>WMI4Java</artifactId>
+			<version>1.6.3</version>
+		</dependency>
+		
+		<!-- JCIFS for SMB/CIFS access -->
+		<dependency>
+			<groupId>org.codelibs</groupId>
+			<artifactId>jcifs</artifactId>
+			<version>2.1.31</version>
+		</dependency>
 	</dependencies>
 
 	<build>
