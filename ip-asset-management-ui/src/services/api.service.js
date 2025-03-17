@@ -46,6 +46,11 @@ class ApiService {
   getScanResults(jobId) {
     return axios.get(API_URL + `scan/results/${jobId}`, { headers: authHeader() });
   }
+  
+  // System monitoring (placeholder - would be implemented on the backend)
+  getSystemResources() {
+    return axios.get(API_URL + 'system/resources', { headers: authHeader() });
+  }
 }
 
 export default new ApiService();

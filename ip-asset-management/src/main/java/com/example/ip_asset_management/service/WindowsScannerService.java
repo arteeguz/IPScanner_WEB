@@ -13,10 +13,20 @@ import org.springframework.stereotype.Service;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
+import java.io.PrintWriter;
+import java.net.InetSocketAddress;
+import java.net.Socket;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.io.PrintWriter;
+import java.net.InetSocketAddress;
+import java.net.Socket;
+import java.util.HashMap;
+import java.util.Map;
 
 @Service
 public class WindowsScannerService {
@@ -398,5 +408,51 @@ public class WindowsScannerService {
         } catch (Exception e) {
             return false;
         }
+    }
+
+    /**
+     * Attempts basic SSH-based scanning for non-Windows systems
+     * Particularly useful for Mac and Linux systems
+     * 
+     * @param ipAddress Target IP address
+     * @return Map containing discovered information
+     */
+    public Map<String, Object> attemptBasicSshScan(String ipAddress) {
+        Map<String, Object> results = new HashMap<>();
+        
+        // Check if SSH port is open
+        try (Socket socket = new Socket()) {
+            socket.connect(new InetSocketAddress(ipAddress, 22), 1000);
+            if (socket.isConnected()) {
+                results.put("sshAvailable", true);
+                results.put("hostType", "Likely Unix/Linux/Mac");
+                
+                // For Mac systems, we can attempt some Banner grabbing
+                try {
+                    BufferedReader reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+                    PrintWriter writer = new PrintWriter(socket.getOutputStream(), true);
+                    
+                    // Wait briefly for SSH banner
+                    String banner = reader.readLine();
+                    if (banner != null && !banner.isEmpty()) {
+                        results.put("sshBanner", banner);
+                        
+                        if (banner.toLowerCase().contains("mac") || banner.toLowerCase().contains("darwin")) {
+                            results.put("osType", "macOS");
+                        } else if (banner.toLowerCase().contains("ubuntu")) {
+                            results.put("osType", "Ubuntu Linux");
+                        } else if (banner.toLowerCase().contains("debian")) {
+                            results.put("osType", "Debian Linux");
+                        }
+                    }
+                } catch (Exception e) {
+                    // Banner grabbing failed, but we know SSH is available
+                }
+            }
+        } catch (Exception e) {
+            results.put("sshAvailable", false);
+        }
+        
+        return results;
     }
 }
