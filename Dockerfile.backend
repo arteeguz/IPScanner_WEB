@@ -1,0 +1,24 @@
+FROM eclipse-temurin:17-jdk
+
+WORKDIR /app
+
+# Copy Maven wrapper and pom.xml
+COPY ./ip-asset-management/mvnw .
+COPY ./ip-asset-management/mvnw.cmd .
+COPY ./ip-asset-management/.mvn ./.mvn
+COPY ./ip-asset-management/pom.xml .
+
+# Make the Maven wrapper executable
+RUN chmod +x ./mvnw
+
+# Download dependencies
+RUN ./mvnw dependency:go-offline -B
+
+# Copy source code
+COPY ./ip-asset-management/src ./src
+
+# Build the application
+RUN ./mvnw package -DskipTests
+
+# Run the application
+ENTRYPOINT ["java", "-jar", "target/ip-asset-management-0.0.1-SNAPSHOT.jar"]

@@ -1,7 +1,14 @@
 import axios from 'axios';
 import authHeader from './auth-header';
 
-const API_URL = 'http://localhost:8080/api/';
+// For Docker environment, use the service name instead of localhost
+// This will be used in the Docker container
+let API_URL = 'http://backend:8080/api/';
+
+// If running in browser, use localhost
+if (typeof window !== 'undefined') {
+  API_URL = 'http://localhost:8080/api/';
+}
 
 class ApiService {
   // Assets
